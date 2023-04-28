@@ -73,16 +73,11 @@ while True:
     if mistakes == 9:
         print(f"  ____ |\n |   | |Слово:  {' '.join(hiddenWord)}\n |   O |\n |  /|\\|Ошибки ({mistakes}): {', '.join(mistakeList)}\n_|_ / \\|  ")
         print(f"Загаданное слово: {word}")
-        print('Вы проиграли!')
+        print('Поражение')
     elif guesedLetters == countRightLetters:
         print(f"Слово: {''.join(hiddenWord)}")
-        print('Вы выиграли!')
+        print('Победа')
     else:
         print('Что-то пошло не так...')
 
     print()
-
-
-
-
-
