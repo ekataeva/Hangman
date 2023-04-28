@@ -25,7 +25,7 @@ while True:
 
         userLetter = input('Введите букву: ').strip().lower()
         while userLetter in guesedLettersList or userLetter in mistakeList or not(len(userLetter)  == 1):
-            userLetter = input('Вы уже вводили эту букву. Введите другую букву: ').strip().lower()
+            userLetter = input('Попробуйте снова: ').strip().lower()
         print()
 
         if userLetter in word:
