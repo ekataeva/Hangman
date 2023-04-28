@@ -14,23 +14,21 @@ while True:
         word = words[random.randint(0,len(words) - 1)]
     countRightLetters = len(set(word[0:len(word) - 1]))
     hiddenWord = ['_'] * (len(word) - 1)
-    guesedLetters = 0
-    guesedLettersList = []
+    countGuesedLetters = 0
     mistakes = 0
     mistakeList = []
     print()
 
     # игрок начинает процесс отгадывания
-    while mistakes < 9 and guesedLetters < countRightLetters:
+    while mistakes < 9 and countGuesedLetters < countRightLetters:
 
         userLetter = input('Введите букву: ').strip().lower()
-        while userLetter in guesedLettersList or userLetter in mistakeList or not(len(userLetter)  == 1):
+        while userLetter.upper() in hiddenWord or userLetter in mistakeList or not(len(userLetter)  == 1):
             userLetter = input('Попробуйте снова: ').strip().lower()
         print()
 
         if userLetter in word:
-            guesedLettersList.append(userLetter)
-            guesedLetters += 1
+            countGuesedLetters += 1
             letterIndex = word.find(userLetter)
             while letterIndex >= 0:
                 hiddenWord[letterIndex] = userLetter.upper()
@@ -74,7 +72,7 @@ while True:
         print(f"  ____ |\n |   | |Слово:  {' '.join(hiddenWord)}\n |   O |\n |  /|\\|Ошибки ({mistakes}): {', '.join(mistakeList)}\n_|_ / \\|  ")
         print(f"Загаданное слово: {word}")
         print('Поражение')
-    elif guesedLetters == countRightLetters:
+    elif countGuesedLetters == countRightLetters:
         print(f"Слово: {''.join(hiddenWord)}")
         print('Победа')
     else:
