@@ -1,89 +1,160 @@
 import random
 
-def startGame():
-    word = makeWord()
-    makeGame(word)  # loop
+def start_game():
+    word = make_word()
+    make_game(word)  # loop
 
-def makeWord():
-    word = None
+def make_word():
     with open("nouns.txt") as file:
         words = file.readlines()  # 40845 words
-        word = words[random.randint(0, len(words) - 1)]
-    return  word
+        return words[random.randint(0, len(words) - 1)]
 
-def makeGame(word):
-    hiddenWord = ['_'] * (len(word) - 1)
+def make_game(word):
+    hidden_word = ['_'] * (len(word) - 1)
     mistakes = 0
-    mistakeList = []
+    mistake_list = []
+    print(f"Слово: {' '.join(hidden_word)}")
 
-    while mistakes < 9 and '_' in hiddenWord:
-        userLetter = makeUserInput(hiddenWord, mistakeList)
-        hiddenWord, mistakes, mistakeList = checkUserInput(word, hiddenWord, userLetter, mistakes, mistakeList)
-        printRes(hiddenWord, mistakes, mistakeList)
+    while mistakes < 9 and '_' in hidden_word:
+        user_letter = make_user_input(hidden_word, mistake_list)
+
+        if user_letter in word:
+            hidden_word = open_letter_in_mask(word, hidden_word, user_letter)
+        else:
+            mistake_list.append(user_letter)
+            mistakes += 1
+
+        print_res(hidden_word, mistakes, mistake_list)
 
     if mistakes == 9:
-        print(
-            f"  ____ |\n |   | |Слово:  {' '.join(hiddenWord)}\n |   O |\n |  /|\\|Ошибки ({mistakes}): {', '.join(mistakeList)}\n_|_ / \\|  ")
+        print_res(hidden_word, mistakes, mistake_list)
         print(f"Загаданное слово: {word}")
         print('Поражение')
-    elif not ('_' in hiddenWord):
-        print(f"Слово: {''.join(hiddenWord)}")
+    elif not ('_' in hidden_word):
+        print(f"Слово: {''.join(hidden_word)}")
         print('Победа')
-    else:
-        print('Что-то пошло не так...')
 
-def makeUserInput(hiddenWord, mistakeList):
-    userLetter = input('Введите букву: ').strip().lower()
+def make_user_input(hidden_word, mistake_list):
+    while True:
+        user_letter = input('Введите букву: ').strip().lower()
+        if user_letter == "_":
+            print("Введите букву кириллического алфавита.")
+            continue
+        if user_letter.upper() in hidden_word:
+            print("Вы уже вводили эту букву.")
+            continue
+        if user_letter in mistake_list:
+            print("Вы уже вводили эту букву.")
+            continue
+        if not (len(user_letter) == 1):
+            print("Введите одну букву.")
+            continue
+        code = ord(user_letter)
+        if code < 1072 or code > 1105:
+            print("Введите букву кириллического алфавита.")
+            continue
+        else:
+            print()
+            return user_letter
 
-    while userLetter.upper() in hiddenWord or userLetter in mistakeList or not (len(userLetter) == 1):
-        userLetter = input('Попробуйте снова: ').strip().lower()
 
-    print()
-    return userLetter
+def open_letter_in_mask(word, hidden_word, user_letter):
+    letter_index = word.find(user_letter)
+    while letter_index >= 0:
+        hidden_word[letter_index] = user_letter.upper()
+        letter_index = word.find(user_letter, letter_index + 1)
+    return hidden_word
 
-def checkUserInput(word, hiddenWord, userLetter, mistakes, mistakeList):
-    if userLetter in word:
-        letterIndex = word.find(userLetter)
-        while letterIndex >= 0:
-            hiddenWord[letterIndex] = userLetter.upper()
-            letterIndex = word.find(userLetter, letterIndex + 1)
-    else:
-        mistakeList.append(userLetter)
-        mistakes += 1
+def print_res(hidden_word, mistakes, mistake_list):
+    word = "Слово: " + ' '.join(hidden_word)
+    mist = "Ошибки (" + str(mistakes) + "):" + ', '.join(mistake_list)
 
-    return hiddenWord, mistakes, mistakeList
+    hangman_states = [
+        [  # 0
+            "       |\n"
+            "       |  {}\n"
+            "       |\n"
+            "       |\n"
+            "       |\n"
+            "       |\n"
+            "========="
+        ],
+        [  # 1
+            "        |\n"
+            "        |  {}\n"
+            "        |\n"
+            "        |  {}\n"
+            "___     |\n"
+            "========="
+        ],
+        [  # 2
+            "        |\n"
+            " |      |  {}\n"
+            " |      |\n"
+            " |      |  {}\n"
+            "_|_     |\n"
+            "========="
+        ],
+        [  # 3
+            "  ____  |\n"
+            " |      |  {}\n"
+            " |      |\n"
+            " |      |  {}\n"
+            "_|_     |  \n"
+            "========="
+        ],
+        [  # 4
+            "  ____  |\n"
+            " |   |  |  {}\n"
+            " |   O  |\n"
+            " |      |  {}\n"
+            "_|_     |  \n"
+            "========="
+        ],
+        [  # 5
+            "  ____  |\n"
+            " |   |  |  {}\n"
+            " |   O  |\n"
+            " |   |  |  {}\n"
+            "_|_     |  \n"
+            "========="
+        ],
+        [  # 6
+            "  ____  |\n"
+            " |   |  |  {}\n"
+            " |   O  |\n"
+            " |  /|  |  {}\n"
+            "_|_     |  \n"
+            "========="
+        ],
+        [  # 7
+            "  ____  |\n"
+            " |   |  |  {}\n"
+            " |   O  |\n"
+            " |  /|\\ | {}\n"
+            "_|_     |\n"
+            "========="
+        ],
+        [  # 8
+            "  ____  |\n"
+            " |   |  |  {}\n"
+            " |   O  |\n"
+            " |  /|\\ | {}\n"
+            "_|_ /   |\n"
+            "========="
+        ],
+        [  # 9
+            "  ____  |\n"
+            " |   |  |  {}\n"
+            " |   O  |\n"
+            " |  /|\\ |  {}\n"
+            "_|_ / \\ |  \n"
+            "========="
+        ]
+    ]
+    formatted_states = [el[0].format(word, mist) for el in hangman_states]
+    print(formatted_states[mistakes])
 
-def printRes(hiddenWord, mistakes, mistakeList):
-    match mistakes:
-        case 8:
-            print(
-                f"  ____ |\n |   | |  Слово:  {' '.join(hiddenWord)}\n |   O |\n |  /|\\| Ошибки ({mistakes}): {', '.join(mistakeList)}\n_|_ /  |  ")
-        case 7:
-            print(
-                f"  ____ |\n |   | |  Слово:  {' '.join(hiddenWord)}\n |   O |\n |  /|\\| Ошибки ({mistakes}): {', '.join(mistakeList)}\n_|_    |  ")
-        case 6:
-            print(
-                f"  ____ |\n |   | |  Слово:  {' '.join(hiddenWord)}\n |   O |\n |  /| |  Ошибки ({mistakes}): {', '.join(mistakeList)}\n_|_    |  ")
-        case 5:
-            print(
-                f"  ____ |\n |   | |  Слово:  {' '.join(hiddenWord)}\n |   O |\n |   | |  Ошибки ({mistakes}): {', '.join(mistakeList)}\n_|_    |  ")
-        case 4:
-            print(
-                f"  ____ |\n |   | |  Слово:  {' '.join(hiddenWord)}\n |   O |\n |     |  Ошибки ({mistakes}): {', '.join(mistakeList)}\n_|_    |  ")
-        case 3:
-            print(
-                f"  ____ |\n |     |  Слово:  {' '.join(hiddenWord)}\n |     |\n |     |  Ошибки ({mistakes}): {', '.join(mistakeList)}\n_|_    |  ")
-        case 2:
-            print(
-                f"       |\n |     |  Слово:  {' '.join(hiddenWord)}\n |     |\n |     |  Ошибки ({mistakes}): {', '.join(mistakeList)}\n_|_    |  ")
-        case 1:
-            print(
-                f"       |\n       |  Слово:  {' '.join(hiddenWord)}\n       |\n       |  Ошибки ({mistakes}): {', '.join(mistakeList)}\n___    |  ")
-        case 0:
-            print(
-                f"       |\n       |  Слово:  {' '.join(hiddenWord)}\n       |\n       |  \n       |  ")
-
-    print()
 
 if __name__ == '__main__':
     while True:
@@ -92,4 +163,4 @@ if __name__ == '__main__':
             exit('До новых встреч')
         else:
             print('В И С Е Л И Ц А')
-            startGame()
+            start_game()
